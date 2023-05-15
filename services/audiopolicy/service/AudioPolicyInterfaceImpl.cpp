@@ -695,7 +695,7 @@ Status AudioPolicyService::getInputForAttr(const media::AudioAttributesInternal&
                 // FIXME: use the same permission as for remote submix for now.
                 FALLTHROUGH_INTENDED;
             case AudioPolicyInterface::API_INPUT_MIX_CAPTURE:
-                if (!isAudioServerOrMediaServerUid(callingUid) && !canCaptureOutput) {
+                if (!canCaptureOutput) {
                     ALOGE("%s permission denied: capture not allowed", __func__);
                     status = PERMISSION_DENIED;
                 }
@@ -780,8 +780,7 @@ Status AudioPolicyService::startInput(int32_t portIdAidl)
     msg << "Audio recording on session " << client->session;
 
     // check calling permissions
-    if (!isAudioServerOrMediaServerUid(IPCThreadState::self()->getCallingUid()) &&
-            !(startRecording(client->attributionSource, String16(msg.str().c_str()),
+    if (!(startRecording(client->attributionSource, String16(msg.str().c_str()),
                          client->attributes.source)
             || client->attributes.source == AUDIO_SOURCE_FM_TUNER
             || client->attributes.source == AUDIO_SOURCE_REMOTE_SUBMIX
